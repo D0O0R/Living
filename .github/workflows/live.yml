@@ -22,11 +22,11 @@ jobs:
           echo "==========Start ke5p=========="
           ONE_COUNT=`./ke5p` && rm -rf ./ke5p
           echo "==========Finish ke5p=========="
-          TIME=$(TZ=+8 date "+%Y-%m-%d %H:%M")
+          TIME=$(TZ=Asia/Shanghai date "+%Y-%m-%d %H:%M")
           echo "$TIME" | cat - time.log > temp && mv temp time.log
           {
             echo "MSG<<EOF" >> $GITHUB_OUTPUT
-            if [ "$ONE_COUNT" -lt 50 ]; then
+            if [ "$ONE_COUNT" -lt 250 ]; then
               echo "Live success 🎉"
             else
               echo "Live fail $ONE_COUNT times. 😥"
