@@ -17,7 +17,7 @@ jobs:
           ONE_TOKEN_API: ${{ secrets.ONE_TOKEN_API }}
         run: |
           export ONE_TOKEN=$(curl -s $ONE_TOKEN_API)
-          wget https://github.com/D0O0R/Ke5p/releases/download/init/ke5p 
+          wget -nv https://github.com/D0O0R/Ke5p/releases/download/init/ke5p 
           chmod +x ke5p
           echo "==========Start ke5p=========="
           ONE_COUNT=`./ke5p` && rm -rf ./ke5p
