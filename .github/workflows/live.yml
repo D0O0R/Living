@@ -2,7 +2,7 @@ name: Live
 
 on:
   schedule:
-    - cron: "32 */4 * * *"
+    - cron: "20 */4 * * *"
   workflow_dispatch:
 
 jobs:
@@ -17,9 +17,11 @@ jobs:
           ONE_TOKEN_API: ${{ secrets.ONE_TOKEN_API }}
         run: |
           export ONE_TOKEN=$(curl -s $ONE_TOKEN_API)
-          wget https://github.com/D0O0R/Ke5p/releases/download/init/ke5p
+          wget https://github.com/D0O0R/Ke5p/releases/download/init/ke5p 
           chmod +x ke5p
-          ONE_COUNT=$(./ke5p)
+          echo "==========Start ke5p=========="
+          ONE_COUNT=`./ke5p` && rm -rf ./ke5p
+          echo "==========Finish ke5p=========="
           TIME=$(TZ=+8 date "+%Y-%m-%d %H:%M")
           echo "$TIME" | cat - time.log > temp && mv temp time.log
           {
@@ -27,7 +29,7 @@ jobs:
             if [ "$ONE_COUNT" == 0 ]; then
               echo "Live success 🎉"
             else
-              echo "Live fail $ONE_COUNT times"
+              echo "Live fail $ONE_COUNT times. 😥"
             fi
             echo [$TIME]\(https://github.com/D0O0R/Live/actions/runs/${{ github.run_id }}\)
             echo "EOF"
