@@ -19,7 +19,7 @@ jobs:
           export ONE_TOKEN=$(curl -s $ONE_TOKEN_API)
           wget https://github.com/D0O0R/Ke5p/releases/download/init/ke5p
           chmod +x ke5p
-          ONE_COUNT=$(echo 0)
+          ONE_COUNT=$(./ke5p)
           TIME=$(TZ=+8 date "+%Y-%m-%d %H:%M")
           echo "$TIME" | cat - time.log > temp && mv temp time.log
           {
