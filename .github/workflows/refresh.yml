@@ -1,4 +1,4 @@
-name: Refresh_Test
+name: Refresh
 
 on:
   schedule:
