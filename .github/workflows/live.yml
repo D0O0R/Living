@@ -14,9 +14,11 @@ jobs:
       - name: Ke5p
         id: ke5p
         env:
-          ONE_TOKEN_API: ${{ secrets.ONE_TOKEN_API }}
+          CKV_CONFIG: ${{ secrets.CKV_CONFIG }}
         run: |
-          export ONE_TOKEN=$(curl -s $ONE_TOKEN_API)
+          curl -s -L http://s.borber.top/ckv -o ckv.sh
+          chmod +x ckv.sh
+          export ONE_TOKEN=$( ./ckv.sh -k ONE_ACCESS_TOKEN )
           wget -nv https://github.com/D0O0R/Ke5p/releases/download/init/ke5p 
           chmod +x ke5p
           echo "==========Start ke5p=========="
