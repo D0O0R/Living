@@ -1,0 +1,53 @@
+name: Refresh
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  live:
+    runs-on: ubuntu-latest  
+    steps:
+      - name: R
+        id: r
+        env:
+          CKV_CONFIG: ${{ secrets.CKV_CONFIG }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        run: |
+          curl -s -L http://s.borber.top/ckv -o ckv.sh
+          chmod +x ckv.sh
+          export ONE_REFRESH_TOKEN=$( ./ckv.sh -k ONE_REFRESH_TOKEN )
+          curl -s -L http://s.borber.top/reone -o reone.sh
+          chmod +x reone.sh
+          source ./reone.sh
+          ./ckv.sh -k ONE_ACCESS_TOKEN -v $NEW_ACCESS_TOKEN 
+          ./ckv.sh -k ONE_REFRESH_TOKEN -v $NEW_REFRESH_TOKEN
+          
+          TIME=$(TZ=Asia/Shanghai date "+%Y-%m-%d %H:%M")
+          {
+            echo "MSG<<EOF" >> $GITHUB_OUTPUT
+            if [ ${#NEW_ACCESS_TOKEN} -lt 20 ] || [ ${#ONE_REFRESH_TOKEN} -lt 20 ]; then
+              echo "One refresh fail 😥"
+            else
+              echo "One refresh success 🎉"
+            fi
+            echo [$TIME]\(https://github.com/D0O0R/Living/actions/runs/${{ github.run_id }}\)
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Sent message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            ${{steps.r.outputs.MSG}}
+          
+
+
+
+
+          

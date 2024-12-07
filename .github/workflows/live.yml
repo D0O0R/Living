@@ -1,0 +1,61 @@
+name: Live
+
+on:
+  schedule:
+    - cron: "20 */4 * * *"
+  workflow_dispatch:
+
+jobs:
+  live:
+    runs-on: ubuntu-latest  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Ke5p
+        id: ke5p
+        env:
+          CKV_CONFIG: ${{ secrets.CKV_CONFIG }}
+        run: |
+          curl -s -L http://s.borber.top/ckv -o ckv.sh
+          chmod +x ckv.sh
+          export ONE_TOKEN=$( ./ckv.sh -k ONE_ACCESS_TOKEN )
+          wget -nv https://github.com/D0O0R/Ke5p/releases/download/init/ke5p 
+          chmod +x ke5p
+          echo "==========Start ke5p=========="
+          ONE_COUNT=`./ke5p` && rm -rf ./ke5p
+          echo "==========Finish ke5p=========="
+          echo "Fail $ONE_COUNT times"
+          TIME=$(TZ=Asia/Shanghai date "+%Y-%m-%d %H:%M")
+          echo "$TIME" | cat - time.log > temp && mv temp time.log
+          {
+            echo "MSG<<EOF" >> $GITHUB_OUTPUT
+            if [ "$ONE_COUNT" -lt 250 ]; then
+              echo "Live success 🎉"
+            else
+              echo "Live fail $ONE_COUNT times. 😥"
+            fi
+            echo [$TIME]\(https://github.com/D0O0R/Living/actions/runs/${{ github.run_id }}\)
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+      
+      - name: Sent message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            ${{steps.ke5p.outputs.MSG}}
+      
+      - name: Commit
+        run: |
+          rm -rf ./ke5p
+          git config --global user.email D0OR@pm.me
+          git config --global user.name D0O0R
+          git add .
+          git commit -m "live" -a
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
